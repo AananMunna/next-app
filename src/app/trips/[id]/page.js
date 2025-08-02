@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getTripsCollection } from "@/lib/db";
-
+import Image from "next/image";
 
 export default async function TripDetailsPage({ params }) {
   const { id } = params;
@@ -15,12 +15,17 @@ export default async function TripDetailsPage({ params }) {
   return (
     <main className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-6">{trip.title}</h1>
-      <img
-        src={trip.image}
-        alt={trip.title}
-        className="w-full h-64 object-cover rounded mb-6"
-        loading="lazy"
-      />
+      
+      <div className="relative w-full h-64 rounded mb-6 overflow-hidden">
+        <Image
+          src={trip.image}
+          alt={trip.title}
+          fill
+          style={{ objectFit: "cover" }}
+          priority={false} // true করলে প্রিমিয়াম লোডিং, দরকার না হলে false রাখো
+        />
+      </div>
+
       <p className="mb-4">{trip.description}</p>
 
       <h2 className="text-2xl font-semibold mb-2">Itinerary</h2>

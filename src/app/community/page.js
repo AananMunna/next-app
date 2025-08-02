@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Users, MapPin, Heart } from "lucide-react";
 
 // Dummy Community Data
@@ -63,11 +64,17 @@ export default function CommunityPage() {
               key={member.id}
               className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden"
             >
-              <img
-                src={member.avatar}
-                alt={member.name}
-                className="w-full h-48 object-cover"
-              />
+              <div className="relative w-full h-48">
+                <Image
+                  src={member.avatar}
+                  alt={member.name}
+                  fill
+                  style={{ objectFit: "cover" }}
+                  priority={false}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
+              </div>
+
               <div className="p-5">
                 <h3 className="text-lg font-semibold text-gray-800">{member.name}</h3>
                 <p className="flex items-center text-gray-600 text-sm mt-1">
