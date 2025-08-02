@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 import {
   Globe,
   ShoppingCart,
@@ -25,13 +26,65 @@ import {
 } from "lucide-react";
 
 export default function Navbar() {
+  const pathname = usePathname();
   const { data: session } = useSession();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMegaOpen, setIsMegaOpen] = useState(false);
   const [isMobileMega, setIsMobileMega] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  // Refs for outside click detection
+  const megaRef = useRef(null);
+  const profileRef = useRef(null);
+  const navRef = useRef(null);
+
+  // Close menus on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        megaRef.current &&
+        !megaRef.current.contains(event.target) &&
+        profileRef.current &&
+        !profileRef.current.contains(event.target) &&
+        navRef.current &&
+        !navRef.current.contains(event.target)
+      ) {
+        setIsMegaOpen(false);
+        setIsProfileOpen(false);
+      }
+    }
+
+    if (isMegaOpen || isProfileOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMegaOpen, isProfileOpen]);
+
+  // Toggle mega menu
+  const toggleMegaMenu = () => {
+    setIsMegaOpen((prev) => !prev);
+    // If mega opens, close profile dropdown
+    if (!isMegaOpen) setIsProfileOpen(false);
+  };
+
+  // Toggle profile dropdown
+  const toggleProfile = () => {
+    setIsProfileOpen((prev) => !prev);
+    // If profile opens, close mega menu
+    if (!isProfileOpen) setIsMegaOpen(false);
+  };
+
+  // Helper to check if link is active
+  const isActive = (href) => pathname === href;
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
+    <nav
+      ref={navRef}
+      className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200"
+    >
       <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
         {/* Brand */}
         <Link
@@ -58,20 +111,37 @@ export default function Navbar() {
 
         {/* Desktop Links */}
         <div className="hidden md:flex space-x-6 text-gray-700 font-medium items-center">
-          <Link href="/" className="flex items-center gap-1 hover:text-blue-600">
+          <Link
+            href="/"
+            className={`flex items-center gap-1 hover:text-blue-600 ${
+              isActive("/") ? "text-blue-700 font-bold" : ""
+            }`}
+          >
             <Home className="w-4 h-4" /> Home
           </Link>
 
           {/* Mega Menu */}
-          <div
-            className="relative group"
-            onMouseEnter={() => setIsMegaOpen(true)}
-            onMouseLeave={() => setIsMegaOpen(false)}
-          >
+          <div className="relative" ref={megaRef}>
             <button
-              className="flex items-center gap-1 hover:text-blue-600 focus:outline-none"
+              className={`flex items-center gap-1 hover:text-blue-600 focus:outline-none ${
+                isActive("/category/smartphones") ||
+                isActive("/category/laptops") ||
+                isActive("/category/smartwatches") ||
+                isActive("/category/tvs")
+                  ? "text-blue-700 font-bold"
+                  : ""
+              }`}
               aria-haspopup="true"
               aria-expanded={isMegaOpen}
+              onClick={toggleMegaMenu}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  toggleMegaMenu();
+                }
+              }}
+              tabIndex={0}
+              type="button"
             >
               <Package className="w-4 h-4" /> Categories
               <ChevronDown className="w-4 h-4" />
@@ -79,17 +149,63 @@ export default function Navbar() {
 
             {isMegaOpen && (
               <div
-                className="absolute left-0 mt-3 w-[750px] bg-white shadow-xl border rounded-lg grid grid-cols-3 gap-6 p-6 animate-fadeIn"
+                className="absolute left-0 mt-3 w-[750px] bg-white shadow-xl border rounded-lg grid grid-cols-3 gap-6 p-6 animate-fadeIn z-50"
                 role="menu"
               >
                 {/* Column 1 */}
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Smart Devices</h4>
                   <ul className="space-y-2 text-sm">
-                    <li><Link href="/category/smartphones" className="flex items-center gap-2 hover:text-blue-600"><Phone className="w-4 h-4" /> Smartphones</Link></li>
-                    <li><Link href="/category/laptops" className="flex items-center gap-2 hover:text-blue-600"><Laptop className="w-4 h-4" /> Laptops</Link></li>
-                    <li><Link href="/category/smartwatches" className="flex items-center gap-2 hover:text-blue-600"><Watch className="w-4 h-4" /> Smartwatches</Link></li>
-                    <li><Link href="/category/tvs" className="flex items-center gap-2 hover:text-blue-600"><Tv className="w-4 h-4" /> Televisions</Link></li>
+                    <li>
+                      <Link
+                        href="/category/smartphones"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/smartphones")
+                            ? "text-blue-700 font-semibold"
+                            : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Phone className="w-4 h-4" /> Smartphones
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/category/laptops"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/laptops")
+                            ? "text-blue-700 font-semibold"
+                            : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Laptop className="w-4 h-4" /> Laptops
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/category/smartwatches"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/smartwatches")
+                            ? "text-blue-700 font-semibold"
+                            : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Watch className="w-4 h-4" /> Smartwatches
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/category/tvs"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/tvs") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Tv className="w-4 h-4" /> Televisions
+                      </Link>
+                    </li>
                   </ul>
                 </div>
 
@@ -97,9 +213,39 @@ export default function Navbar() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Accessories</h4>
                   <ul className="space-y-2 text-sm">
-                    <li><Link href="/category/audio" className="flex items-center gap-2 hover:text-blue-600"><Headphones className="w-4 h-4" /> Headphones</Link></li>
-                    <li><Link href="/category/home" className="flex items-center gap-2 hover:text-blue-600"><Gift className="w-4 h-4" /> Smart Home</Link></li>
-                    <li><Link href="/category/gaming" className="flex items-center gap-2 hover:text-blue-600"><Gift className="w-4 h-4" /> Gaming</Link></li>
+                    <li>
+                      <Link
+                        href="/category/audio"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/audio") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Headphones className="w-4 h-4" /> Headphones
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/category/home"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/home") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Gift className="w-4 h-4" /> Smart Home
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/category/gaming"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/category/gaming") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Gift className="w-4 h-4" /> Gaming
+                      </Link>
+                    </li>
                   </ul>
                 </div>
 
@@ -107,22 +253,67 @@ export default function Navbar() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-3">Special Offers</h4>
                   <ul className="space-y-2 text-sm">
-                    <li><Link href="/deals" className="flex items-center gap-2 hover:text-blue-600"><Percent className="w-4 h-4" /> Deals & Discounts</Link></li>
-                    <li><Link href="/new-arrivals" className="flex items-center gap-2 hover:text-blue-600"><Gift className="w-4 h-4" /> New Arrivals</Link></li>
-                    <li><Link href="/shipping" className="flex items-center gap-2 hover:text-blue-600"><Truck className="w-4 h-4" /> Free Shipping</Link></li>
+                    <li>
+                      <Link
+                        href="/deals"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/deals") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Percent className="w-4 h-4" /> Deals & Discounts
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/new-arrivals"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/new-arrivals") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Gift className="w-4 h-4" /> New Arrivals
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/shipping"
+                        className={`flex items-center gap-2 hover:text-blue-600 ${
+                          isActive("/shipping") ? "text-blue-700 font-semibold" : ""
+                        }`}
+                        role="menuitem"
+                      >
+                        <Truck className="w-4 h-4" /> Free Shipping
+                      </Link>
+                    </li>
                   </ul>
                 </div>
               </div>
             )}
           </div>
 
-          <Link href="/deals" className="flex items-center gap-1 hover:text-blue-600">
+          <Link
+            href="/deals"
+            className={`flex items-center gap-1 hover:text-blue-600 ${
+              isActive("/deals") ? "text-blue-700 font-bold" : ""
+            }`}
+          >
             <Percent className="w-4 h-4" /> Deals
           </Link>
-          <Link href="/community" className="flex items-center gap-1 hover:text-blue-600">
+          <Link
+            href="/community"
+            className={`flex items-center gap-1 hover:text-blue-600 ${
+              isActive("/community") ? "text-blue-700 font-bold" : ""
+            }`}
+          >
             <Gift className="w-4 h-4" /> Community
           </Link>
-          <Link href="/about" className="flex items-center gap-1 hover:text-blue-600">
+          <Link
+            href="/about"
+            className={`flex items-center gap-1 hover:text-blue-600 ${
+              isActive("/about") ? "text-blue-700 font-bold" : ""
+            }`}
+          >
             <Globe className="w-4 h-4" /> About Us
           </Link>
 
@@ -154,22 +345,55 @@ export default function Navbar() {
           </Link>
 
           {session?.user ? (
-            <div className="relative group">
-              <button className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100">
+            <div className="relative" ref={profileRef}>
+              <button
+                onClick={toggleProfile}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 focus:outline-none"
+                aria-haspopup="true"
+                aria-expanded={isProfileOpen}
+                type="button"
+              >
                 <User className="w-6 h-6" />
                 <span className="hidden sm:block">{session.user.name}</span>
               </button>
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block">
-                <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">My Profile</Link>
-                <Link href="/orders" className="block px-4 py-2 hover:bg-gray-100">My Orders</Link>
-                <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">Settings</Link>
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+              {isProfileOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50"
+                  role="menu"
                 >
-                  Logout
-                </button>
-              </div>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                    role="menuitem"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
+                    role="menuitem"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <>
@@ -192,6 +416,7 @@ export default function Navbar() {
           <button
             className="md:hidden p-2 rounded-lg hover:bg-gray-100"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -204,22 +429,46 @@ export default function Navbar() {
           <button
             onClick={() => setIsMobileMega(!isMobileMega)}
             className="w-full flex justify-between items-center py-2 font-semibold text-gray-700"
+            aria-expanded={isMobileMega}
+            aria-controls="mobile-categories"
           >
             Categories <ChevronDown className="w-4 h-4" />
           </button>
           {isMobileMega && (
-            <div className="pl-4 space-y-2 text-sm">
-              <Link href="/category/smartphones" className="block">Smartphones</Link>
-              <Link href="/category/laptops" className="block">Laptops</Link>
-              <Link href="/category/smartwatches" className="block">Smartwatches</Link>
-              <Link href="/category/tvs" className="block">Televisions</Link>
-              <Link href="/category/audio" className="block">Headphones</Link>
-              <Link href="/category/gaming" className="block">Gaming</Link>
+            <div
+              id="mobile-categories"
+              className="pl-4 space-y-2 text-sm"
+              role="menu"
+            >
+              <Link href="/category/smartphones" className="block" role="menuitem">
+                Smartphones
+              </Link>
+              <Link href="/category/laptops" className="block" role="menuitem">
+                Laptops
+              </Link>
+              <Link href="/category/smartwatches" className="block" role="menuitem">
+                Smartwatches
+              </Link>
+              <Link href="/category/tvs" className="block" role="menuitem">
+                Televisions
+              </Link>
+              <Link href="/category/audio" className="block" role="menuitem">
+                Headphones
+              </Link>
+              <Link href="/category/gaming" className="block" role="menuitem">
+                Gaming
+              </Link>
             </div>
           )}
-          <Link href="/deals" className="block">Deals</Link>
-          <Link href="/community" className="block">Community</Link>
-          <Link href="/about" className="block">About Us</Link>
+          <Link href="/deals" className="block">
+            Deals
+          </Link>
+          <Link href="/community" className="block">
+            Community
+          </Link>
+          <Link href="/about" className="block">
+            About Us
+          </Link>
         </div>
       )}
     </nav>

@@ -44,12 +44,53 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "www.notebookcheck.net",
-        pathname: "/fileadmin/Notebooks/News/**",
+        hostname: "diamu.com.bd",
+        pathname: "/**",
+      },
+      // Added hosts from fake data below:
+      {
+        protocol: "https",
+        hostname: "example.com",  // placeholder domain from fake images; replace with real if available
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "diamu.com.bd",
+        hostname: "oppo.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "oneplus.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "google.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "xiaomi.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "sony.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "motorola.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "asus.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "realme.com",
         pathname: "/**",
       },
     ],
