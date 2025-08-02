@@ -9,5 +9,9 @@ export async function getTripsCollection() {
   const db = await getDb();
   return db.collection("trip-data");
 }
+export async function getUsersCollection() {
+  const db = await getDb();
+  return db.collection("users");
+}
 
 // You can add more collections or helpers here later!
