@@ -4,19 +4,55 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "res.cloudinary.com", // Cloudinary base domain
-        pathname: "/**", // allow all Cloudinary paths
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "www.samsung.com", // Samsung official images
-        pathname: "/**", // allow all Samsung paths
+        hostname: "www.samsung.com",
+        pathname: "/**",
+      },
+      {
+      protocol: "https",
+      hostname: "images.samsung.com",
+      pathname: "/**",
+    },
+      {
+        protocol: "https",
+        hostname: "image-us.samsung.com",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "image-us.samsung.com", // Samsung's US CDN
-        pathname: "/**", // allow product images/videos from Samsung
+        hostname: "store.storeimages.cdn-apple.com",
+        pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "i01.appmifile.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.vivoglobal.com",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.notebookcheck.net",
+        pathname: "/fileadmin/Notebooks/News/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.notebookcheck.net",
+        pathname: "/fileadmin/Notebooks/News/**",
+      },
+      {
+  protocol: "https",
+  hostname: "diamu.com.bd",
+  pathname: "/**",
+}
+
     ],
   },
 };
