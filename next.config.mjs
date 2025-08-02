@@ -13,10 +13,10 @@ const nextConfig = {
         pathname: "/**",
       },
       {
-      protocol: "https",
-      hostname: "images.samsung.com",
-      pathname: "/**",
-    },
+        protocol: "https",
+        hostname: "images.samsung.com",
+        pathname: "/**",
+      },
       {
         protocol: "https",
         hostname: "image-us.samsung.com",
@@ -48,11 +48,10 @@ const nextConfig = {
         pathname: "/fileadmin/Notebooks/News/**",
       },
       {
-  protocol: "https",
-  hostname: "diamu.com.bd",
-  pathname: "/**",
-}
-
+        protocol: "https",
+        hostname: "diamu.com.bd",
+        pathname: "/**",
+      },
     ],
   },
 };
