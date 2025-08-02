@@ -74,7 +74,7 @@ export default async function ProductsPage() {
               {/* Action Buttons */}
               <div className="mt-auto flex gap-2">
                 <Link
-                  href={`/products/${id}`}
+                  href={`/trips/${id}`}
                   className="flex-1 inline-block text-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                 >
                   View Details

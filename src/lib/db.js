@@ -5,7 +5,7 @@ export async function getDb() {
   return client.db("next-test");
 }
 
-export async function getTripsCollection() {
+export async function getProductsCollection() {
   const db = await getDb();
   return db.collection("phonesCollection");
 }
