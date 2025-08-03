@@ -79,6 +79,7 @@ export default async function ProductDetailsPage({ params }) {
           <AddToCartButton 
   productId={product._id.toString()} 
   price={product.discountPrice ?? product.price} 
+  productImg={product?.images?.[0]}
 />
 
           <p className="mt-6 text-gray-700 leading-relaxed">{product?.overview}</p>

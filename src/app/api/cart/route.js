@@ -10,12 +10,12 @@ export async function POST(req) {
     return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
-  const { productId, price, quantity } = await req.json();
+  const { productId, price,productImg, quantity } = await req.json();
 
   await cartCollection.updateOne(
     { userId: session.user.email },
     {
-      $push: { items: { productId, price, quantity } },
+      $push: { items: { productId, price, productImg, quantity } },
       $set: { updatedAt: new Date() },
     },
     { upsert: true }

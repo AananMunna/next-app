@@ -2,7 +2,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-export default function AddToCartButton({ productId, price }) {
+export default function AddToCartButton({ productId, price, productImg }) {
   const [loading, setLoading] = useState(false);
 
   const handleAddToCart = async () => {
@@ -14,6 +14,7 @@ export default function AddToCartButton({ productId, price }) {
         body: JSON.stringify({
           productId,
           price,
+          productImg,
           quantity: 1,
         }),
       });
