@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { getProductsCollection } from "@/lib/db";
 import Image from "next/image";
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default async function ProductDetailsPage({ params }) {
   const { id } = params;
@@ -75,13 +76,10 @@ export default async function ProductDetailsPage({ params }) {
 
           <p className="text-gray-700 font-medium">Warranty: {product?.warranty}</p>
 
-          <button
-            className={`mt-auto px-6 py-3 rounded-lg font-semibold transition 
-              ${product?.stock > 0 ? "bg-blue-600 hover:bg-blue-700 text-white" : "bg-gray-300 cursor-not-allowed"}`}
-            disabled={product?.stock <= 0}
-          >
-            Add to Cart
-          </button>
+          <AddToCartButton 
+  productId={product._id.toString()} 
+  price={product.discountPrice ?? product.price} 
+/>
 
           <p className="mt-6 text-gray-700 leading-relaxed">{product?.overview}</p>
         </div>
