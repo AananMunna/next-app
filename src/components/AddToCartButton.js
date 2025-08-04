@@ -1,44 +1,33 @@
 "use client";
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 
-export default function AddToCartButton({ productId, price, productImg }) {
-  const [loading, setLoading] = useState(false);
-
+export default function AddToCartButton({ product }) {
   const handleAddToCart = async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/cart", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId,
-          price,
-          productImg,
-          quantity: 1,
-        }),
+        body: JSON.stringify(product),
       });
 
       const data = await res.json();
       if (res.ok) {
-        toast.success("✅ Added to cart!");
+        toast.success(data.message || "Added to cart ✅");
       } else {
-        toast.error(data.error || "❌ Something went wrong");
+        toast.error(data.error || "Failed to add ❌");
       }
     } catch (err) {
-      toast.error("❌ Failed to add to cart");
-    } finally {
-      setLoading(false);
+      console.error("Cart add error:", err);
+      toast.error("Something went wrong ❌");
     }
   };
 
   return (
     <button
       onClick={handleAddToCart}
-      disabled={loading}
-      className="mt-auto px-6 py-3 rounded-lg font-semibold transition bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+      className="mt-6 w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg shadow-lg text-lg font-bold text-white transition"
     >
-      {loading ? "Adding..." : "Add to Cart"}
+      Add to Cart
     </button>
   );
 }

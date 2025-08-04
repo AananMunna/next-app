@@ -76,11 +76,18 @@ export default async function ProductDetailsPage({ params }) {
 
           <p className="text-gray-700 font-medium">Warranty: {product?.warranty}</p>
 
-          <AddToCartButton 
-  productId={product._id.toString()} 
-  price={product.discountPrice ?? product.price} 
-  productImg={product?.images?.[0]}
+<AddToCartButton 
+  product={{
+    productId: product._id.toString(),
+    title: product.title,
+    brand: product.brand,
+    model: product.model,
+    price: product.discountPrice ?? product.price,
+    productImg: product.images?.[0],
+    quantity: 1, // always 1, backend will increment if exists
+  }}
 />
+
 
           <p className="mt-6 text-gray-700 leading-relaxed">{product?.overview}</p>
         </div>
