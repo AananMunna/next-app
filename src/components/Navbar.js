@@ -26,6 +26,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
+  console.log(session);
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMegaOpen, setIsMegaOpen] = useState(false);
   const [isMobileMega, setIsMobileMega] = useState(false);
@@ -223,6 +225,9 @@ export default function Navbar() {
                 </button>
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
+                    <Link href={`/dashboard/${session.user.role}`} className="block px-4 py-2 hover:bg-gray-100">
+                      Dashboard
+                    </Link>
                     <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
                       My Profile
                     </Link>

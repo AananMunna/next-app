@@ -19,6 +19,7 @@ export async function POST(req) {
       email,
       password: hashedPassword,
       createdAt: new Date(),
+      userRole: 'customer'
     });
 
     return Response.json(

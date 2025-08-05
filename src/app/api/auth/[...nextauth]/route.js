@@ -12,22 +12,45 @@ const handler = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-            const usersCollection = await getUsersCollection();
-        
-        const user = await usersCollection.findOne({ email: credentials.email });
+        const usersCollection = await getUsersCollection();
 
+        const user = await usersCollection.findOne({ email: credentials.email });
+        console.log(user);
         if (!user) throw new Error("No user found");
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) throw new Error("Invalid password");
 
-        return { id: user._id.toString(), name: user.name, email: user.email };
+        return { 
+          id: user._id.toString(), 
+          name: user.name, 
+          email: user.email,
+          role: user.role || "customer" // default role if not set
+        };
       },
     }),
   ],
+
   session: { strategy: "jwt" },
+
   pages: { signIn: "/login" },
+
   secret: process.env.AUTH_SECRET,
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role; // Add role to JWT token
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.role = token.role; // Make role available in session
+      }
+      return session;
+    },
+  },
 });
 
 export { handler as GET, handler as POST };

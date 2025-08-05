@@ -1,38 +1,40 @@
 import { NextResponse } from "next/server";
-import { withAuth } from "next-auth/middleware";
+import { getToken } from "next-auth/jwt";
 
-export default withAuth({
-  pages: {
-    signIn: "/login",
-  },
-});
-
-export const config = {
-  matcher: [
-    // শুধু /trips/[কিছু] protect করবে
-    "/trips/:path+",
-    "/community/:path+"
-  ],
-};
-
-// middleware.js
-
-export function middleware(req) {
-  const role = req.cookies.get("role")?.value;
-
+export async function middleware(req) {
+  const token = await getToken({ req, secret: process.env.AUTH_SECRET });
   const pathname = req.nextUrl.pathname;
 
-  if (pathname.startsWith("/dashboard")) {
-    if (!role) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
+  // Not logged in? redirect to login
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
 
+  const role = token.role;
+
+  // Role-based access control for dashboard routes
+  if (pathname.startsWith("/dashboard")) {
     if (pathname.startsWith("/dashboard/admin") && role !== "admin") {
       return NextResponse.redirect(new URL("/unauthorized", req.url));
     }
-    // Repeat for seller, deliveryman
+    if (pathname.startsWith("/dashboard/seller") && role !== "seller") {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+    if (pathname.startsWith("/dashboard/deliveryman") && role !== "deliveryman") {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
+    if (pathname.startsWith("/dashboard/customer") && role !== "customer") {
+      return NextResponse.redirect(new URL("/unauthorized", req.url));
+    }
   }
 
   return NextResponse.next();
 }
 
+export const config = {
+  matcher: [
+    "/dashboard/:path*",   // Protect all dashboard routes
+    "/trips/:path*",       // keep your trips protected
+    "/community/:path*",   // keep your community protected
+  ],
+};

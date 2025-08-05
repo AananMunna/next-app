@@ -1,9 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import Provider from "@/components/Provider";
-import { Toaster } from "react-hot-toast"; // ✅ Import Toaster
+import LayoutWrapper from "@/components/LayoutWrapper"; // 🔑 new wrapper
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,37 +21,9 @@ export const metadata = {
 export default function RootLayout({ children, session }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Provider session={session}>
-          <Navbar />
-          {children}
-          <Footer />
-          {/* ✅ Toast Provider */}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              style: {
-                borderRadius: "8px",
-                background: "#333",
-                color: "#fff",
-                fontSize: "14px",
-              },
-              success: {
-                iconTheme: {
-                  primary: "#4ade80",
-                  secondary: "#fff",
-                },
-              },
-              error: {
-                iconTheme: {
-                  primary: "#ef4444",
-                  secondary: "#fff",
-                },
-              },
-            }}
-          />
+          <LayoutWrapper>{children}</LayoutWrapper>
         </Provider>
       </body>
     </html>
