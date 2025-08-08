@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 export default function CartPage() {
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
 
   // Fetch Cart
   useEffect(() => {
@@ -69,14 +71,52 @@ export default function CartPage() {
     }
   };
 
-  // Calculate total
-  const totalPrice = cart.reduce(
-    (sum, item) => sum + (item?.price || 0) * (item?.quantity || 0),
-    0
-  );
+  // Checkout
+const handleCheckout = async () => {
+  if (!session?.user) {
+    toast.error("Please login to checkout 🔐");
+    return;
+  }
 
+  // Prepare productId + quantity pairs
+  const items = cart.map(item => ({
+    productId: item.productId,
+    quantity: item.quantity || 1,
+  }));
+
+  try {
+    const res = await fetch("/api/sslcommerz-init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        items,
+        user: {
+          name: session.user.name,
+          email: session.user.email,
+          phone: session.user.phone || "01700000000",
+          address: session.user.address || "Dhaka",
+          city: session.user.city || "Dhaka",
+        }
+      }),
+    });
+
+    const data = await res.json();
+    if (data?.url) {
+      window.location.href = data.url; // Redirect to SSLCommerz
+    } else {
+      toast.error("Checkout failed ❌");
+    }
+  } catch (err) {
+    console.error("Checkout Error:", err);
+    toast.error("Error during checkout ❌");
+  }
+};
+
+
+  // UI: Loading
   if (loading) return <p className="text-center mt-12">Loading your cart...</p>;
 
+  // UI: Empty Cart
   if (!cart?.length)
     return (
       <div className="max-w-md mx-auto py-12 text-center px-4">
@@ -90,6 +130,12 @@ export default function CartPage() {
       </div>
     );
 
+  // UI: Cart with Items
+  const totalPrice = cart.reduce(
+    (sum, item) => sum + (item?.price || 0) * (item?.quantity || 0),
+    0
+  );
+
   return (
     <main className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-6 text-center md:text-left">
@@ -97,7 +143,7 @@ export default function CartPage() {
       </h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* LEFT SIDE - Cart Items */}
+        {/* LEFT SIDE */}
         <div className="flex-1 space-y-6">
           {cart.map((item) => (
             <div
@@ -158,17 +204,10 @@ export default function CartPage() {
                   >
                     Remove
                   </button>
-
-                  <button
-                    onClick={() => toast.success("Saved for later (mock)")}
-                    className="text-blue-500 hover:underline text-sm"
-                  >
-                    Save for later
-                  </button>
                 </div>
               </div>
 
-              {/* Subtotal per item */}
+              {/* Subtotal */}
               <p className="font-bold text-gray-800 text-lg text-center sm:text-right">
                 ${(item?.price || 0) * (item?.quantity || 1)}
               </p>
@@ -191,11 +230,14 @@ export default function CartPage() {
             <span>Total</span>
             <span>${totalPrice.toFixed(2)}</span>
           </p>
-          <button className="w-full py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition">
+          <button
+            onClick={handleCheckout}
+            className="w-full py-3 bg-yellow-400 text-gray-900 font-bold rounded-lg hover:bg-yellow-500 transition"
+          >
             Proceed to Checkout
           </button>
           <p className="text-xs text-gray-500 mt-3 text-center md:text-left">
-            Secure transaction powered by FutureShop 🔒
+            Secure transaction powered by SSLCommerz 🔒
           </p>
         </div>
       </div>

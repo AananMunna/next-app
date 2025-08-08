@@ -17,5 +17,9 @@ export async function getCartCollection() {
   const db = await getDb();
   return db.collection("cart");
 }
+export async function getOrdersCollection() {
+  const db = await getDb();
+  return db.collection("orders");
+}
 
 // You can add more collections or helpers here later!
