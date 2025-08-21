@@ -3,23 +3,112 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react"; // icons
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { 
+  Menu, 
+  X, 
+  ChevronLeft, 
+  Home, 
+  Package, 
+  CreditCard, 
+  Heart, 
+  MapPin, 
+  Star, 
+  RefreshCw, 
+  Bell, 
+  MessageSquare, 
+  FileText, 
+  User, 
+  HelpCircle,
+  BarChart3,
+  Box,
+  Truck,
+  Settings,
+  Users,
+  PieChart,
+  ShoppingBag,
+  Calendar,
+  Award,
+  Shield,
+  BookOpen,
+  TrendingUp,
+  Wallet,
+  Car,
+  Clock,
+  FileCheck
+} from "lucide-react";
+import Loading from "../loading";
+
+// Icon mapping for navigation items
+const iconMap = {
+  "Overview": Home,
+  "Orders & Tracking": Package,
+  "Orders": Package,
+  "Deliveries": Truck,
+  "Payments": CreditCard,
+  "Wishlist": Heart,
+  "Saved Addresses": MapPin,
+  "Loyalty & Rewards": Star,
+  "Returns & Refunds": RefreshCw,
+  "Messages & Notifications": Bell,
+  "My Reviews": MessageSquare,
+  "Download Invoices": FileText,
+  "Account Settings": User,
+  "Customer Support": HelpCircle,
+  "Dashboard": BarChart3,
+  "Products": Box,
+  "Sales Analytics": TrendingUp,
+  "Inventory Management": Package,
+  "Marketing Tools": Award,
+  "Customer Ratings": Star,
+  "Seller Support": HelpCircle,
+  "Earnings": Wallet,
+  "Schedule": Calendar,
+  "Vehicles": Car,
+  "Profile": User,
+  "Training": BookOpen,
+  "Performance": TrendingUp,
+  "Users": Users,
+  "Analytics": PieChart,
+  "Manage Products": ShoppingBag,
+  "Reports": FileCheck,
+  "Roles & Permissions": Shield,
+  "Support Tickets": HelpCircle,
+  "System Logs": Settings
+};
 
 export default function DashboardLayout({ children }) {
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  if (status === "loading") return <div>Loading...</div>;
-  if (!session) return <div>Please log in to view this page.</div>;
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+      if (window.innerWidth < 1024) {
+        setIsCollapsed(false);
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (status === "loading") return <Loading />;
+  if (!session) return <div className="p-8 text-center">Please log in to view this page.</div>;
 
   const role = session?.user?.role || "customer";
+  // const role = "seller";
 
   const navLinks = {
     customer: [
@@ -77,65 +166,137 @@ export default function DashboardLayout({ children }) {
   };
 
   if (!navLinks[role]) {
-    return <div>Access Denied: You do not have permission to view this dashboard.</div>;
+    return <div className="p-8 text-center">Access Denied: You do not have permission to view this dashboard.</div>;
   }
 
+  const toggleSidebar = () => {
+    if (isMobile) {
+      setSidebarOpen(!sidebarOpen);
+    } else {
+      setIsCollapsed(!isCollapsed);
+    }
+  };
+
+  const sidebarWidth = isCollapsed ? "w-16" : "w-64";
+  const mobileSidebarClass = sidebarOpen ? "translate-x-0" : "-translate-x-full";
+  const desktopSidebarClass = isCollapsed ? "lg:w-16" : "lg:w-64";
+
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-[#1447E6] text-white flex items-center justify-between px-4 py-3 shadow-md z-50">
-        <h1 className="font-bold text-lg">{role} Panel</h1>
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-primary text-primary-foreground flex items-center justify-between px-4 py-3 shadow-md z-50">
+        <h1 className="font-bold text-lg capitalize">{role} Panel</h1>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="text-white hover:bg-[#1239B8]"
+          onClick={toggleSidebar}
+          className="text-primary-foreground hover:bg-primary/20"
         >
           {sidebarOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </Button>
       </div>
 
+      {/* Sidebar Overlay for Mobile */}
+      {isMobile && sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 bg-white dark:bg-gray-800 shadow-xl z-40 transform transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed top-0 left-0 h-full ${sidebarWidth} bg-card border-r border-border shadow-xl z-50 transform transition-all duration-300 lg:translate-x-0 ${isMobile ? mobileSidebarClass : ''} ${desktopSidebarClass}`}
       >
-        <div className="pt-20 lg:pt-8 px-6 sticky top-0">
-          <Card className="mb-8 p-4 text-center bg-[#1447E6] text-white shadow-lg">
-            <h2 className="text-xl font-bold capitalize">{role} Panel</h2>
-            <Badge className="mt-2 bg-white text-[#1447E6] font-semibold">
-              {role.toUpperCase()}
-            </Badge>
-          </Card>
+        <div className="flex flex-col h-full">
+          {/* Header */}
+          <div className="p-4 border-b border-border">
+            <Card className="p-3 text-center bg-primary text-primary-foreground">
+              {!isCollapsed ? (
+                <div>
+                  <h2 className="text-lg font-bold capitalize">{role} Panel</h2>
+                  <Badge className="mt-1 bg-primary-foreground text-primary font-semibold">
+                    {role.toUpperCase()}
+                  </Badge>
+                </div>
+              ) : (
+                <div className="flex justify-center">
+                  <Badge className="bg-primary-foreground text-primary font-semibold text-xs">
+                    {role.charAt(0).toUpperCase()}
+                  </Badge>
+                </div>
+              )}
+            </Card>
+            
+            {/* Collapse Toggle Button - Desktop only */}
+            {!isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="absolute -right-3 top-11 h-6 w-6 rounded-full bg-border hover:bg-muted"
+              >
+                <ChevronLeft className={`h-4 w-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
+              </Button>
+            )}
+          </div>
 
-          <ScrollArea className="h-[calc(100vh-160px)]">
-            <nav className="flex flex-col space-y-2">
-              {navLinks[role].map(({ href, label }) => {
-                const active = pathname === href;
-                return (
-                  <Link key={href} href={href} className="w-full">
-                    <Button
-                      variant={active ? "default" : "ghost"}
-                      className={`justify-start w-full text-left rounded-lg transition-colors ${
-                        active
-                          ? "bg-[#1447E6] text-white hover:bg-[#1239B8]"
-                          : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
-                      }`}
-                    >
-                      {label}
-                    </Button>
-                  </Link>
-                );
-              })}
+          {/* Navigation */}
+          <ScrollArea className="flex-1 px-3 py-4">
+            <nav className="space-y-1">
+              <TooltipProvider>
+                {navLinks[role].map(({ href, label }) => {
+                  const active = pathname === href;
+                  const IconComponent = iconMap[label] || HelpCircle;
+                  
+                  return (
+                    <Tooltip key={href} delayDuration={0}>
+                      <TooltipTrigger asChild>
+                        <Link href={href}>
+                          <Button
+                            variant={active ? "default" : "ghost"}
+                            className={`justify-start w-full rounded-lg transition-all ${
+                              isCollapsed ? "px-3" : "px-4"
+                            } ${
+                              active
+                                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                                : "text-foreground hover:bg-accent"
+                            }`}
+                          >
+                            <IconComponent className="h-5 w-5 flex-shrink-0" />
+                            {!isCollapsed && <span className="ml-3">{label}</span>}
+                          </Button>
+                        </Link>
+                      </TooltipTrigger>
+                      {isCollapsed && (
+                        <TooltipContent side="right" className="ml-2">
+                          {label}
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  );
+                })}
+              </TooltipProvider>
             </nav>
           </ScrollArea>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-border">
+            <Link href="/">
+              <Button variant="ghost" className={`justify-start w-full ${isCollapsed ? "px-3" : "px-4"}`}>
+                <Home className="h-5 w-5" />
+                {!isCollapsed && <span className="ml-3">Back to Home</span>}
+              </Button>
+            </Link>
+          </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 lg:p-8 mt-14 lg:mt-0 lg:ml-72 transition-all">
-        {children}
+      <main className={`flex-1 transition-all duration-300 ${isCollapsed ? "lg:ml-16" : "lg:ml-64"} ${isMobile ? "mt-14" : ""}`}>
+        <div className="p-4 lg:p-6">
+          {children}
+        </div>
       </main>
     </div>
   );

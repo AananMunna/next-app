@@ -19,12 +19,12 @@ export default function Loading() {
         <div className="absolute -inset-4 border-4 border-primary/20 rounded-full animate-ping"></div>
         
         {/* Main spinner */}
-        <div className="absolute -ins-4">
+        {/* <div className="absolute -ins-4">
           <div className="w-24 h-24 border-4 border-transparent rounded-full 
                           border-t-primary border-r-accent animate-spin" 
                style={{ animationDuration: '1.5s' }}>
           </div>
-        </div>
+        </div> */}
       </div>
       
       {/* Loading text with subtle animation */}
