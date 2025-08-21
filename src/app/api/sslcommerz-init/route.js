@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getProductsCollection, getOrdersCollection } from "@/lib/db";
 import { ObjectId } from "mongodb";
+import { redirect } from "next/navigation";
 
 export async function POST(req) {
   const Product = await getProductsCollection();
@@ -83,7 +84,12 @@ export async function POST(req) {
       body: new URLSearchParams(sslczPayload),
     });
 
+
+
     const data = await response.json();
+
+    // const url = data?.GatewayPageURL
+    // redirect(url)
 
     if (data?.GatewayPageURL) {
       return NextResponse.json({ url: data.GatewayPageURL });
