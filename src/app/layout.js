@@ -1,5 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
+
 import LayoutWrapper from "@/components/LayoutWrapper";
 import Providers from "@/components/Provider";
 
@@ -20,10 +22,14 @@ export const metadata = {
 
 export default function RootLayout({ children, session }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers session={session}>
-          <LayoutWrapper>{children}</LayoutWrapper>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

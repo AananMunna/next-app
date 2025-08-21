@@ -21,6 +21,7 @@ import {
   Tv,
   Home,
 } from "lucide-react";
+import { ThemeToggle } from "@/lib/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -208,6 +209,8 @@ export default function Navbar() {
 
           {/* Icons & Auth */}
           <div className="flex items-center gap-4">
+                  <ThemeToggle />
+
             <Link href="/wishlist" className="relative hover:text-red-500">
               <Heart className="w-6 h-6" />
             </Link>
@@ -247,7 +250,7 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <Link href="/login" className="px-3 py-1 bg-blue-600 text-white rounded">
+              <Link href="/register" className="px-3 py-1 bg-blue-600 text-white rounded">
                 Login
               </Link>
             )}
