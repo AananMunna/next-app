@@ -1,285 +1,358 @@
 "use client";
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import {
-  Globe,
+  Menu,
+  X,
+  Search,
   ShoppingCart,
   User,
   Heart,
-  Menu,
-  ChevronDown,
-  Package,
-  Percent,
-  Gift,
-  Headphones,
-  Truck,
   Phone,
-  Laptop,
-  Watch,
-  Tv,
+  LogOut,
+  PackageOpen,
+  Shield,
   Home,
+  Grid,
+  Percent,
+  UserCog
 } from "lucide-react";
 import { ThemeToggle } from "@/lib/ThemeToggle";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { data: session } = useSession();
-
-  console.log(session);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isMegaOpen, setIsMegaOpen] = useState(false);
-  const [isMobileMega, setIsMobileMega] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const megaRef = useRef(null);
-  const profileRef = useRef(null);
-  const navRef = useRef(null);
-
-  // Close menus on outside click
+  // Handle scroll for navbar background
   useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        megaRef.current &&
-        !megaRef.current.contains(event.target) &&
-        profileRef.current &&
-        !profileRef.current.contains(event.target) &&
-        navRef.current &&
-        !navRef.current.contains(event.target)
-      ) {
-        setIsMegaOpen(false);
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Close profile dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isProfileOpen && !event.target.closest('.profile-dropdown')) {
         setIsProfileOpen(false);
       }
-    }
-    if (isMegaOpen || isProfileOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMegaOpen, isProfileOpen]);
-
-  const toggleMegaMenu = () => {
-    setIsMegaOpen((prev) => !prev);
-    if (!isMegaOpen) setIsProfileOpen(false);
-  };
-
-  const toggleProfile = () => {
-    setIsProfileOpen((prev) => !prev);
-    if (!isProfileOpen) setIsMegaOpen(false);
-  };
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileOpen]);
 
   const isActive = (href) => pathname === href;
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    // Implement search functionality
+    console.log("Searching for:", searchQuery);
+  };
 
   return (
     <>
       {/* Top Navbar */}
       <nav
-        ref={navRef}
-        className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200"
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          isScrolled 
+            ? "bg-background/95 backdrop-blur border-b" 
+            : "bg-background border-b"
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center h-16">
-          {/* Brand */}
+          {/* Mobile Menu Button */}
+          <div className="flex md:hidden">
+            <button 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="p-2 rounded-md hover:bg-accent"
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Brand Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-blue-600 font-extrabold text-xl"
+            className="flex items-center gap-2 font-bold text-xl text-primary"
           >
-            <Globe className="w-7 h-7" />
-            <span className="hidden sm:block">FutureShop</span>
+            <Phone className="h-6 w-6" />
+            <span className="hidden sm:block">PhoneHub</span>
           </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden md:flex space-x-6 text-gray-700 font-medium items-center">
+          {/* Desktop Navigation - Hidden on mobile */}
+          <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link
               href="/"
-              className={`flex items-center gap-1 hover:text-blue-600 ${
-                isActive("/") ? "text-blue-700 font-bold" : ""
-              }`}
+              className={`transition-colors hover:text-primary ${isActive("/") ? "text-primary font-semibold" : "text-foreground"}`}
             >
-              <Home className="w-4 h-4" /> Home
+              Home
             </Link>
-
-            {/* Mega Menu */}
-            <div className="relative" ref={megaRef}>
-              <button
-                className={`flex items-center gap-1 hover:text-blue-600 ${
-                  isMegaOpen ? "text-blue-700 font-bold" : ""
-                }`}
-                onClick={toggleMegaMenu}
-              >
-                <Package className="w-4 h-4" /> Categories
-                <ChevronDown className="w-4 h-4" />
-              </button>
-              {isMegaOpen && (
-                <div className="absolute left-0 mt-3 w-[750px] bg-white shadow-xl border rounded-lg grid grid-cols-3 gap-6 p-6 z-50">
-                  <div>
-                    <h4 className="font-semibold mb-3">Smart Devices</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li>
-                        <Link href="/category/smartphones" className="block hover:text-blue-600">
-                          <Phone className="w-4 h-4 inline" /> Smartphones
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/category/laptops" className="block hover:text-blue-600">
-                          <Laptop className="w-4 h-4 inline" /> Laptops
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/category/smartwatches" className="block hover:text-blue-600">
-                          <Watch className="w-4 h-4 inline" /> Smartwatches
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/category/tvs" className="block hover:text-blue-600">
-                          <Tv className="w-4 h-4 inline" /> Televisions
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-3">Accessories</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li>
-                        <Link href="/category/audio" className="block hover:text-blue-600">
-                          <Headphones className="w-4 h-4 inline" /> Headphones
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/category/home" className="block hover:text-blue-600">
-                          <Gift className="w-4 h-4 inline" /> Smart Home
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/category/gaming" className="block hover:text-blue-600">
-                          <Gift className="w-4 h-4 inline" /> Gaming
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-3">Special Offers</h4>
-                    <ul className="space-y-2 text-sm">
-                      <li>
-                        <Link href="/deals" className="block hover:text-blue-600">
-                          <Percent className="w-4 h-4 inline" /> Deals & Discounts
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/new-arrivals" className="block hover:text-blue-600">
-                          <Gift className="w-4 h-4 inline" /> New Arrivals
-                        </Link>
-                      </li>
-                      <li>
-                        <Link href="/shipping" className="block hover:text-blue-600">
-                          <Truck className="w-4 h-4 inline" /> Free Shipping
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-            </div>
-
+            <Link
+              href="/products"
+              className={`transition-colors hover:text-primary ${isActive("/products") ? "text-primary font-semibold" : "text-foreground"}`}
+            >
+              Products
+            </Link>
             <Link
               href="/deals"
-              className={`flex items-center gap-1 hover:text-blue-600 ${
-                isActive("/deals") ? "text-blue-700 font-bold" : ""
-              }`}
+              className={`transition-colors hover:text-primary ${isActive("/deals") ? "text-primary font-semibold" : "text-foreground"}`}
             >
-              <Percent className="w-4 h-4" /> Deals
-            </Link>
-            <Link
-              href="/community"
-              className={`flex items-center gap-1 hover:text-blue-600 ${
-                isActive("/community") ? "text-blue-700 font-bold" : ""
-              }`}
-            >
-              <Gift className="w-4 h-4" /> Community
+              Deals
             </Link>
             <Link
               href="/about"
-              className={`flex items-center gap-1 hover:text-blue-600 ${
-                isActive("/about") ? "text-blue-700 font-bold" : ""
-              }`}
+              className={`transition-colors hover:text-primary ${isActive("/about") ? "text-primary font-semibold" : "text-foreground"}`}
             >
-              <Globe className="w-4 h-4" /> About Us
+              About
             </Link>
           </div>
 
-          {/* Icons & Auth */}
-          <div className="flex items-center gap-4">
-                  <ThemeToggle />
+          {/* Right side icons and actions */}
+          <div className="flex items-center gap-2">
+            {/* Search bar - visible on desktop */}
+            <div className="hidden md:flex relative">
+              <form onSubmit={handleSearch} className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="search"
+                  placeholder="Search phones..."
+                  className="pl-9 w-[200px] lg:w-[300px] py-2 px-3 rounded-md border border-input bg-background text-sm"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </form>
+            </div>
 
-            <Link href="/wishlist" className="relative hover:text-red-500">
-              <Heart className="w-6 h-6" />
+            <ThemeToggle />
+
+            <button className="p-2 rounded-md hover:bg-accent md:hidden">
+              <Search className="h-5 w-5" />
+            </button>
+
+            <Link href="/wishlist" className="p-2 rounded-md hover:bg-accent">
+              <Heart className="h-5 w-5" />
             </Link>
-            <Link href="/cart" className="relative hover:text-blue-600">
-              <ShoppingCart className="w-6 h-6" />
+
+            <Link href="/cart" className="p-2 rounded-md hover:bg-accent relative">
+              <ShoppingCart className="h-5 w-5" />
+              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
+                3
+              </span>
             </Link>
+
             {session?.user ? (
-              <div className="relative" ref={profileRef}>
-                <button
-                  onClick={toggleProfile}
-                  className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100"
+              <div className="relative profile-dropdown">
+                <button 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="p-2 rounded-full hover:bg-accent"
                 >
-                  <User className="w-6 h-6" />
-                  <span className="hidden sm:block">{session.user.name}</span>
+                  <User className="h-5 w-5" />
                 </button>
                 {isProfileOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg z-50">
-                    <Link href={`/dashboard/${session.user.role}`} className="block px-4 py-2 hover:bg-gray-100">
-                      Dashboard
-                    </Link>
-                    <Link href="/profile" className="block px-4 py-2 hover:bg-gray-100">
-                      My Profile
-                    </Link>
-                    <Link href="/orders" className="block px-4 py-2 hover:bg-gray-100">
-                      My Orders
-                    </Link>
-                    <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100">
-                      Settings
-                    </Link>
-                    <button
-                      onClick={() => signOut({ callbackUrl: "/" })}
-                      className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
-                    >
-                      Logout
-                    </button>
+                  <div className="absolute right-0 mt-2 w-48 bg-popover text-popover-foreground rounded-md shadow-lg border z-50">
+                    <div className="p-3 border-b">
+                      <p className="font-medium">{session.user.name}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {session.user.email}
+                      </p>
+                    </div>
+                    <div className="p-1">
+                      <Link 
+                        href="/dashboard" 
+                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <PackageOpen className="h-4 w-4" />
+                        <span>Dashboard</span>
+                      </Link>
+                      <Link 
+                        href="/profile" 
+                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <UserCog className="h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                      {session.user.role === "admin" && (
+                        <Link 
+                          href="/admin" 
+                          className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
+                          onClick={() => setIsProfileOpen(false)}
+                        >
+                          <Shield className="h-4 w-4" />
+                          <span>Admin</span>
+                        </Link>
+                      )}
+                      <div className="border-t my-1"></div>
+                      <button 
+                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm w-full text-destructive"
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Log out</span>
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
             ) : (
-              <Link href="/register" className="px-3 py-1 bg-blue-600 text-white rounded">
+              <Link 
+                href="/login" 
+                className="hidden md:flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90"
+              >
                 Login
               </Link>
             )}
-            <button
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              <Menu className="w-6 h-6" />
-            </button>
           </div>
         </div>
+
+        {/* Mobile Search - appears when scrolling on mobile */}
+        {isScrolled && (
+          <div className="md:hidden p-2 border-t">
+            <form onSubmit={handleSearch} className="relative">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="search"
+                placeholder="Search phones..."
+                className="pl-9 w-full py-2 px-3 rounded-md border border-input bg-background text-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </form>
+          </div>
+        )}
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-background border-t shadow-lg z-40">
+            <div className="p-4 space-y-4">
+              <Link 
+                href="/" 
+                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Home className="h-5 w-5" />
+                <span>Home</span>
+              </Link>
+              <Link 
+                href="/products" 
+                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/products") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Grid className="h-5 w-5" />
+                <span>Products</span>
+              </Link>
+              <Link 
+                href="/deals" 
+                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/deals") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Percent className="h-5 w-5" />
+                <span>Deals</span>
+              </Link>
+              <Link 
+                href="/about" 
+                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/about") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Shield className="h-5 w-5" />
+                <span>About Us</span>
+              </Link>
+              
+              <div className="pt-4 border-t">
+                {session ? (
+                  <button 
+                    className="flex items-center gap-3 py-2 px-3 rounded-lg text-destructive w-full hover:bg-accent"
+                    onClick={() => {
+                      signOut({ callbackUrl: "/" });
+                      setIsMenuOpen(false);
+                    }}
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Sign Out</span>
+                  </button>
+                ) : (
+                  <Link 
+                    href="/login" 
+                    className="flex items-center justify-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg font-medium"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="h-5 w-5" />
+                    <span>Login</span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Mobile Bottom Navbar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg flex justify-around items-center h-14 z-50">
-        <Link href="/" className="flex flex-col items-center text-sm">
-          <Home className="w-5 h-5" /> Home
+      <div className="fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around items-center h-16 z-40 md:hidden">
+        <Link 
+          href="/" 
+          className="flex flex-col items-center gap-1 p-2"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div className={`rounded-full p-1 ${isActive("/") ? "bg-primary text-primary-foreground" : ""}`}>
+            <Home className="h-5 w-5" />
+          </div>
+          <span className="text-xs">Home</span>
         </Link>
-        <Link href="/categories" className="flex flex-col items-center text-sm">
-          <Package className="w-5 h-5" /> Categories
+
+        <Link 
+          href="/products" 
+          className="flex flex-col items-center gap-1 p-2"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div className={`rounded-full p-1 ${isActive("/products") ? "bg-primary text-primary-foreground" : ""}`}>
+            <Grid className="h-5 w-5" />
+          </div>
+          <span className="text-xs">Products</span>
         </Link>
-        <Link href="/deals" className="flex flex-col items-center text-sm">
-          <Percent className="w-5 h-5" /> Deals
+
+        <Link 
+          href="/deals" 
+          className="flex flex-col items-center gap-1 p-2"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div className={`rounded-full p-1 ${isActive("/deals") ? "bg-primary text-primary-foreground" : ""}`}>
+            <Percent className="h-5 w-5" />
+          </div>
+          <span className="text-xs">Deals</span>
         </Link>
-        <Link href="/cart" className="flex flex-col items-center text-sm relative">
-          <ShoppingCart className="w-5 h-5" /> Cart
+
+        <Link 
+          href="/cart" 
+          className="flex flex-col items-center gap-1 p-2 relative"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div className={`rounded-full p-1 ${isActive("/cart") ? "bg-primary text-primary-foreground" : ""}`}>
+            <ShoppingCart className="h-5 w-5" />
+          </div>
+          <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
+            3
+          </span>
+          <span className="text-xs">Cart</span>
         </Link>
-        <Link href="/profile" className="flex flex-col items-center text-sm">
-          <User className="w-5 h-5" /> Account
+
+        <Link 
+          href={session ? "/profile" : "/login"} 
+          className="flex flex-col items-center gap-1 p-2"
+          onClick={() => setIsMenuOpen(false)}
+        >
+          <div className={`rounded-full p-1 ${isActive("/profile") || isActive("/login") ? "bg-primary text-primary-foreground" : ""}`}>
+            <User className="h-5 w-5" />
+          </div>
+          <span className="text-xs">{session ? "Profile" : "Login"}</span>
         </Link>
       </div>
     </>
