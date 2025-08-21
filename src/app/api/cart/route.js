@@ -11,7 +11,7 @@ export async function POST(req) {
     return NextResponse.json({ error: "Login required" }, { status: 401 });
   }
 
-  const { productId, price, productImg, quantity } = await req.json();
+  const { productId, title, brand, model, price, productImg, quantity } = await req.json();
 
   // Find the user's cart
   const cart = await cartCollection.findOne({ userId: session.user.email });
@@ -26,17 +26,32 @@ export async function POST(req) {
         { userId: session.user.email, "items.productId": productId },
         {
           $inc: { "items.$.quantity": quantity }, // increment quantity
-          $set: { updatedAt: new Date() },
+          $set: { 
+            "items.$.price": price, // update price in case it changed
+            "items.$.productImg": productImg, // update image in case it changed
+            updatedAt: new Date() 
+          },
         }
       );
 
       return NextResponse.json({ message: "Quantity updated ✅" });
     } else {
-      // Add new product to items
+      // Add new product to items with all details
       await cartCollection.updateOne(
         { userId: session.user.email },
         {
-          $push: { items: { productId, price, productImg, quantity } },
+          $push: { 
+            items: { 
+              productId, 
+              title,
+              brand,
+              model,
+              price, 
+              productImg, 
+              quantity,
+              addedAt: new Date()
+            } 
+          },
           $set: { updatedAt: new Date() },
         }
       );
@@ -44,10 +59,19 @@ export async function POST(req) {
       return NextResponse.json({ message: "Product added ✅" });
     }
   } else {
-    // Create new cart for user
+    // Create new cart for user with all product details
     await cartCollection.insertOne({
       userId: session.user.email,
-      items: [{ productId, price, productImg, quantity }],
+      items: [{ 
+        productId, 
+        title,
+        brand,
+        model,
+        price, 
+        productImg, 
+        quantity,
+        addedAt: new Date()
+      }],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -55,7 +79,6 @@ export async function POST(req) {
     return NextResponse.json({ message: "New cart created & product added ✅" });
   }
 }
-
 
 // Get all cart items
 export async function GET() {
@@ -82,7 +105,10 @@ export async function PUT(req) {
   await cartCollection.updateOne(
     { userId: session.user.email, "items.productId": productId },
     {
-      $set: { "items.$.quantity": quantity, updatedAt: new Date() },
+      $set: { 
+        "items.$.quantity": quantity, 
+        updatedAt: new Date() 
+      },
     }
   );
 
@@ -101,7 +127,10 @@ export async function DELETE(req) {
 
   await cartCollection.updateOne(
     { userId: session.user.email },
-    { $pull: { items: { productId } }, $set: { updatedAt: new Date() } }
+    { 
+      $pull: { items: { productId } }, 
+      $set: { updatedAt: new Date() } 
+    }
   );
 
   return NextResponse.json({ message: "Item removed 🗑️" });
