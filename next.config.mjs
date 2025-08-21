@@ -50,7 +50,7 @@ const nextConfig = {
       // Added hosts from fake data below:
       {
         protocol: "https",
-        hostname: "example.com",  // placeholder domain from fake images; replace with real if available
+        hostname: "example.com", // placeholder domain from fake images; replace with real if available
         pathname: "/**",
       },
       {
@@ -91,6 +91,17 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "realme.com",
+        pathname: "/**",
+      },
+      // ✅ ImgBB support
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "ibb.co",
         pathname: "/**",
       },
     ],
