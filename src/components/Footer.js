@@ -16,6 +16,7 @@ import {
   Truck,
   DollarSign,
 } from "lucide-react";
+import PhoneHubLogo from "./PhoneHubLogo";
 
 const footerLinks = {
   shop: [
@@ -47,8 +48,8 @@ export default function Footer() {
           {/* Brand & Intro */}
           <div>
             <div className="flex items-center gap-2 text-primary font-bold text-xl mb-3">
-              <Globe className="w-7 h-7" />
-              <span>PhoneHub</span>
+                         <PhoneHubLogo/>
+
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
               Shop the future today. Cutting-edge smartphones, exclusive deals,

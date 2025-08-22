@@ -17,9 +17,11 @@ import {
   Home,
   Grid,
   Percent,
-  UserCog
+  UserCog,
+  Smartphone
 } from "lucide-react";
 import { ThemeToggle } from "@/lib/ThemeToggle";
+import PhoneHubLogo from "./PhoneHubLogo";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -83,8 +85,7 @@ export default function Navbar() {
             href="/"
             className="flex items-center gap-2 font-bold text-xl text-primary"
           >
-            <Phone className="h-6 w-6" />
-            <span className="hidden sm:block">PhoneHub</span>
+              <PhoneHubLogo/>
           </Link>
 
           {/* Desktop Navigation - Hidden on mobile */}

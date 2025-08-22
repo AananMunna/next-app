@@ -6,52 +6,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Mail, Lock, User, Smartphone, ArrowRight, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Smartphone, ArrowRight, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import PhoneHubLogo from "@/components/PhoneHubLogo";
 
-export default function RegisterPage() {
-  const [name, setName] = useState("");
+export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
-    // Validate passwords match
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({ name, email, password }),
-        headers: { "Content-Type": "application/json" },
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Something went wrong");
-
-      // Auto login after registration
-      const loginRes = await signIn("credentials", {
+      // Credentials login
+      const res = await signIn("credentials", {
         redirect: false,
         email,
         password,
       });
 
-      if (loginRes?.error) throw new Error(loginRes.error);
+      if (res?.error) throw new Error(res.error);
 
+      // Successful login → redirect to home
       router.push("/");
     } catch (err) {
       setError(err.message);
@@ -65,7 +47,7 @@ export default function RegisterPage() {
     try {
       await signIn(provider, { callbackUrl: "/" });
     } catch (err) {
-      setError(`Failed to register with ${provider}`);
+      setError(`Failed to login with ${provider}`);
       setIsLoading(false);
     }
   };
@@ -78,14 +60,14 @@ export default function RegisterPage() {
         <Card className="border-border shadow-lg">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center text-foreground">
-              Create an account
+              Welcome back
             </CardTitle>
             <CardDescription className="text-center text-muted-foreground">
-              Enter your details to create a new account
+              Enter your credentials to access your account
             </CardDescription>
           </CardHeader>
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
               {/* Error message */}
               {error && (
@@ -93,24 +75,6 @@ export default function RegisterPage() {
                   {error}
                 </div>
               )}
-
-              {/* Name input */}
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-foreground">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="pl-10"
-                    required
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
 
               {/* Email input */}
               <div className="space-y-2">
@@ -132,13 +96,21 @@ export default function RegisterPage() {
 
               {/* Password input */}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password" className="text-foreground">Password</Label>
+                  <a
+                    href="/forgot-password"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Create a password"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pl-10 pr-10"
@@ -160,37 +132,7 @@ export default function RegisterPage() {
                 </div>
               </div>
 
-              {/* Confirm Password input */}
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10"
-                    required
-                    disabled={isLoading}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    disabled={isLoading}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="h-4 w-4" />
-                    ) : (
-                      <Eye className="h-4 w-4" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Register button */}
+              {/* Login button */}
               <Button
                 type="submit"
                 className="w-full"
@@ -199,11 +141,11 @@ export default function RegisterPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating account...
+                    Signing in...
                   </>
                 ) : (
                   <>
-                    Create account
+                    Sign in
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </>
                 )}
@@ -215,7 +157,7 @@ export default function RegisterPage() {
             <Separator className="my-4" />
           </div>
 
-          {/* Social registration */}
+          {/* Social login */}
           <CardFooter className="flex flex-col space-y-4">
             <Button
               variant="outline"
@@ -245,12 +187,12 @@ export default function RegisterPage() {
             </Button>
 
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{" "}
+              Don't have an account?{" "}
               <a
-                href="/login"
+                href="/register"
                 className="font-medium text-primary hover:underline"
               >
-                Sign in
+                Create account
               </a>
             </p>
           </CardFooter>
@@ -259,7 +201,7 @@ export default function RegisterPage() {
         {/* Additional info */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
-            By creating an account, you agree to our{" "}
+            By continuing, you agree to our{" "}
             <a href="/terms" className="text-primary hover:underline">
               Terms of Service
             </a>{" "}

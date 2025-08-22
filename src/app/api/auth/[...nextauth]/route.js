@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
 import { getUsersCollection } from "@/lib/db";
 import bcrypt from "bcrypt";
 
@@ -13,41 +14,39 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         const usersCollection = await getUsersCollection();
-
         const user = await usersCollection.findOne({ email: credentials.email });
-        console.log(user);
+
         if (!user) throw new Error("No user found");
 
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) throw new Error("Invalid password");
 
-        return { 
-          id: user._id.toString(), 
-          name: user.name, 
+        return {
+          id: user._id.toString(),
+          name: user.name,
           email: user.email,
-          role: user.role || "customer" // default role if not set
+          role: user.role || "customer",
         };
       },
+    }),
+
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
 
   session: { strategy: "jwt" },
-
-  pages: { signIn: "/login" },
-
   secret: process.env.AUTH_SECRET,
+  pages: { signIn: "/login" },
 
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role; // Add role to JWT token
-      }
+      if (user) token.role = user.role;
       return token;
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role; // Make role available in session
-      }
+      if (token) session.user.role = token.role;
       return session;
     },
   },
