@@ -1,4 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PhoneMarket
+
+A modern e-commerce web application for smartphones, built with Next.js, MongoDB, and Tailwind CSS. Features include product browsing, filtering, authentication (email/password & Google), user dashboards, cart, checkout, and role-based access for customers, sellers, deliverymen, and admins.
+
+---
+
+## 🚀 Setup & Installation
+
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/your-username/phone-market.git
+   cd phone-market
+   ```
+
+2. **Install dependencies:**
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
+
+3. **Configure environment variables:**
+   - Copy `.env.local.example` to `.env.local` (or edit existing).
+   - Fill in your MongoDB URI, NextAuth secrets, Google OAuth credentials, and other required keys.
+
+4. **Run the development server:**
+   ```sh
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+5. **Open the app:**
+   - Visit [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 🗺️ Route Summary
+
+| Route                        | Description                                 | Access         |
+|------------------------------|---------------------------------------------|----------------|
+| `/`                          | Home page with hero & featured products     | Public         |
+| `/products`                  | Product listing & filtering                 | Public         |
+| `/products/[id]`             | Product details page                        | Public         |
+| `/login`                     | Login page (email/password, Google)         | Public         |
+| `/register`                  | Registration page                           | Public         |
+| `/cart`                      | Shopping cart                               | Authenticated  |
+| `/dashboard`                 | User dashboard (role-based)                 | Authenticated  |
+| `/dashboard/addProduct`      | Add new product (customer/seller)           | Authenticated  |
+| `/dashboard/customer/*`      | Customer dashboard routes                   | Customer only  |
+| `/dashboard/seller/*`        | Seller dashboard routes                     | Seller only    |
+| `/dashboard/deliveryman/*`   | Deliveryman dashboard routes                | Deliveryman    |
+| `/dashboard/admin/*`         | Admin dashboard routes                      | Admin only     |
+| `/deals`                     | Deals & discounts                           | Public         |
+| `/wishlist`                  | Wishlist                                    | Authenticated  |
+| `/community`                 | Community page                              | Public         |
+| `/about`                     | About us                                    | Public         |
+| `/contact`                   | Contact page                                | Public         |
+| `/unauthorized`              | Unauthorized access page                    | Public         |
+| `/api/*`                     | REST API endpoints (products, auth, cart)   | Internal/API   |
+
+---
+
+## 🛠️ Tech Stack
+
+- **Next.js** (App Router)
+- **MongoDB** (Atlas)
+- **Tailwind CSS**
+- **NextAuth.js** (Credentials & Google)
+- **Lucide Icons**
+- **Framer Motion** (animations)
+- **Role-based middleware**
+
+---
 
 ## Getting Started
 
