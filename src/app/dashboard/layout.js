@@ -113,6 +113,7 @@ export default function DashboardLayout({ children }) {
   const navLinks = {
     customer: [
       { href: "/dashboard/customer", label: "Overview" },
+      { href: "/dashboard/addProduct", label: "Add Product" },
       { href: "/dashboard/customer/orders", label: "Orders & Tracking" },
       { href: "/dashboard/customer/payments", label: "Payments" },
       { href: "/dashboard/customer/wishlist", label: "Wishlist" },

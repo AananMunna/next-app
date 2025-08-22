@@ -22,6 +22,7 @@ export default function ProductFilterLayout() {
   const [sortBy, setSortBy] = useState("releaseDateDesc");
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log(products);
   // Mobile filter modal state
   const [showFilters, setShowFilters] = useState(false);
 

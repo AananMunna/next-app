@@ -5,6 +5,7 @@ export async function GET(req) {
   const collection = await getProductsCollection();
   const { searchParams } = new URL(req.url);
 
+  // Extract query params with defaults
   const search = searchParams.get("search") || "";
   const brands = searchParams.get("brands")?.split(",").filter(Boolean) || [];
   const minPrice = Number(searchParams.get("minPrice")) || 0;
@@ -12,9 +13,29 @@ export async function GET(req) {
   const discountOnly = searchParams.get("discountOnly") === "true";
   const sortBy = searchParams.get("sortBy") || "releaseDateDesc";
 
-  // Build query
+  // ------------------------------
+  // Sorting logic
+  // ------------------------------
+  let sortOption = {};
+  if (sortBy === "priceAsc") {
+    // Ascending by discountPrice first, then price
+    sortOption = { discountPrice: 1, price: 1 };
+  } else if (sortBy === "priceDesc") {
+    // Descending by discountPrice first, then price
+    sortOption = { discountPrice: -1, price: -1 };
+  } else {
+    // Default → sort by newest (releaseDate descending)
+    sortOption = { releaseDate: -1 };
+  }
+
+  // ------------------------------
+  // MongoDB Query with $expr
+  // ------------------------------
+  // Using $expr + $toDouble ensures price is always treated as a number,
+  // even if stored as string in MongoDB.
   const query = {
     $and: [
+      // Search filter (brand, model, title)
       search
         ? {
             $or: [
@@ -24,24 +45,34 @@ export async function GET(req) {
             ],
           }
         : {},
+      // Brand filter
       brands.length > 0 ? { brand: { $in: brands } } : {},
-      { price: { $gte: minPrice, $lte: maxPrice } },
+      // Discount-only filter
       discountOnly ? { discountPrice: { $exists: true, $ne: null } } : {},
+      // Price filter using $expr (handles string/number)
+      {
+        $expr: {
+          $and: [
+            { $gte: [{ $toDouble: "$price" }, minPrice] },
+            { $lte: [{ $toDouble: "$price" }, maxPrice] },
+          ],
+        },
+      },
     ],
   };
 
-  // Sorting
-  let sortOption = {};
-  if (sortBy === "priceAsc") {
-    sortOption = { discountPrice: 1, price: 1 };
-  } else if (sortBy === "priceDesc") {
-    sortOption = { discountPrice: -1, price: -1 };
-  } else {
-    sortOption = { releaseDate: -1 }; // newest first
-  }
-
+  // ------------------------------
+  // Fetch products
+  // ------------------------------
   const products = await collection.find(query).sort(sortOption).toArray();
 
+  // Debug logs (only for development)
+  console.log("Query =>", JSON.stringify(query, null, 2));
+  console.log("Products Found =>", products.length);
+
+  // ------------------------------
+  // Return response with _id as string
+  // ------------------------------
   return NextResponse.json(
     products.map((p) => ({
       ...p,
