@@ -31,14 +31,15 @@ export default async function ProductDetailsPage({ params }) {
           <Card className="overflow-hidden">
             <div className="relative w-full aspect-square md:h-[400px] rounded-xl overflow-hidden">
               <Image
-                src={product?.images?.[0] ?? "/placeholder.png"}
-                alt={product?.title ?? "Product Image"}
-                fill
-                style={{ objectFit: "contain" }}
-                priority
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="p-4"
-              />
+  src={product?.images?.[0] && product.images[0].trim() !== "" ? product.images[0] : "/placeholder.png"}
+  alt={product?.title ?? "Product Image"}
+  fill
+  style={{ objectFit: "contain" }}
+  priority
+  sizes="(max-width: 768px) 100vw, 50vw"
+  className="p-4"
+/>
+
             </div>
           </Card>
 
@@ -77,17 +78,20 @@ export default async function ProductDetailsPage({ params }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center text-yellow-500">
-              {"⭐".repeat(Math.floor(product?.rating || 0))}
-              {product?.rating % 1 >= 0.5 && "⭐"}
-              <span className="text-foreground ml-2 font-bold">
-                {product?.rating?.toFixed(1) || "N/A"}
-              </span>
-            </div>
-            <span className="text-muted-foreground text-sm">
-              ({product?.reviews?.length ?? 0} reviews)
-            </span>
-          </div>
+  <div className="flex items-center text-yellow-500">
+    {Array.from({ length: Math.floor(Number(product?.rating) || 0) }).map((_, i) => (
+      <span key={i}>⭐</span>
+    ))}
+    {(Number(product?.rating) % 1) >= 0.5 && <span>⭐</span>}
+    <span className="text-foreground ml-2 font-bold">
+      {typeof product?.rating === "number" ? product.rating.toFixed(1) : "N/A"}
+    </span>
+  </div>
+  <span className="text-muted-foreground text-sm">
+    ({Array.isArray(product?.reviews) ? product.reviews.length : 0} reviews)
+  </span>
+</div>
+
 
           <div className="flex items-baseline gap-3">
             <p className="text-3xl font-bold text-primary">

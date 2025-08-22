@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
@@ -47,7 +53,7 @@ export default function ProductFilterLayout() {
         setIsLoading(false);
       }
     };
-    
+
     // Add a small delay to prevent too many rapid requests
     const timeoutId = setTimeout(fetchProducts, 300);
     return () => clearTimeout(timeoutId);
@@ -120,9 +126,11 @@ export default function ProductFilterLayout() {
             ))
           ) : products.length === 0 ? (
             <div className="col-span-full text-center py-12">
-              <div className="text-muted-foreground mb-4">No products match your filters.</div>
-              <Button 
-                variant="outline" 
+              <div className="text-muted-foreground mb-4">
+                No products match your filters.
+              </div>
+              <Button
+                variant="outline"
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedBrands([]);
@@ -140,10 +148,10 @@ export default function ProductFilterLayout() {
                 className="group overflow-hidden transition-all hover:shadow-md"
               >
                 <div className="relative w-full h-56">
-                  {p.images?.length > 0 ? (
+                  {p.images?.length > 0 && p.images[0]?.trim() !== "" ? (
                     <Image
                       src={p.images[0]}
-                      alt={p.title}
+                      alt={p.title || "Product Image"}
                       fill
                       className="object-contain p-4 transition-transform group-hover:scale-105"
                       sizes="(max-width: 768px) 100vw, 33vw"
@@ -153,6 +161,7 @@ export default function ProductFilterLayout() {
                       No Image
                     </div>
                   )}
+
                   {p.discountPrice && (
                     <div className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
                       SAVE ${(p.price - p.discountPrice).toFixed(0)}
@@ -160,21 +169,23 @@ export default function ProductFilterLayout() {
                   )}
                 </div>
                 <CardContent className="p-4">
-                  <h2 className="text-lg font-semibold text-foreground truncate mb-2">{p.title}</h2>
+                  <h2 className="text-lg font-semibold text-foreground truncate mb-2">
+                    {p.title}
+                  </h2>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-xl font-bold text-primary">
                       ${p.discountPrice || p.price}
                     </span>
                     {p.discountPrice && (
-                      <span className="line-through text-muted-foreground text-sm">${p.price}</span>
+                      <span className="line-through text-muted-foreground text-sm">
+                        ${p.price}
+                      </span>
                     )}
                   </div>
                 </CardContent>
                 <CardFooter className="p-4 pt-0">
                   <Button asChild className="w-full">
-                    <Link href={`/products/${p._id}`}>
-                      View Details
-                    </Link>
+                    <Link href={`/products/${p._id}`}>View Details</Link>
                   </Button>
                 </CardFooter>
               </Card>
@@ -258,7 +269,9 @@ function FilterContent({
         <Label>Brand</Label>
         <div className="max-h-36 overflow-y-auto border border-border rounded-md p-3 space-y-2">
           {brands.length === 0 ? (
-            <p className="text-muted-foreground text-sm italic">No brands found</p>
+            <p className="text-muted-foreground text-sm italic">
+              No brands found
+            </p>
           ) : (
             brands.map((brand) => (
               <div key={brand} className="flex items-center space-x-2">
@@ -305,7 +318,10 @@ function FilterContent({
           checked={discountOnly}
           onCheckedChange={() => setDiscountOnly(!discountOnly)}
         />
-        <Label htmlFor="discount-only" className="text-sm font-normal cursor-pointer">
+        <Label
+          htmlFor="discount-only"
+          className="text-sm font-normal cursor-pointer"
+        >
           Discounted Only
         </Label>
       </div>

@@ -112,19 +112,19 @@ export default function DashboardLayout({ children }) {
 
   const navLinks = {
     customer: [
-      { href: "/dashboard/customer", label: "Overview" },
+      // { href: "/dashboard/customer", label: "Overview" },
       { href: "/dashboard/addProduct", label: "Add Product" },
-      { href: "/dashboard/customer/orders", label: "Orders & Tracking" },
-      { href: "/dashboard/customer/payments", label: "Payments" },
-      { href: "/dashboard/customer/wishlist", label: "Wishlist" },
-      { href: "/dashboard/customer/addresses", label: "Saved Addresses" },
-      { href: "/dashboard/customer/rewards", label: "Loyalty & Rewards" },
-      { href: "/dashboard/customer/returns", label: "Returns & Refunds" },
-      { href: "/dashboard/customer/notifications", label: "Messages & Notifications" },
-      { href: "/dashboard/customer/reviews", label: "My Reviews" },
-      { href: "/dashboard/customer/invoices", label: "Download Invoices" },
-      { href: "/dashboard/customer/profile", label: "Account Settings" },
-      { href: "/dashboard/customer/support", label: "Customer Support" },
+      // { href: "/dashboard/customer/orders", label: "Orders & Tracking" },
+      // { href: "/dashboard/customer/payments", label: "Payments" },
+      // { href: "/dashboard/customer/wishlist", label: "Wishlist" },
+      // { href: "/dashboard/customer/addresses", label: "Saved Addresses" },
+      // { href: "/dashboard/customer/rewards", label: "Loyalty & Rewards" },
+      // { href: "/dashboard/customer/returns", label: "Returns & Refunds" },
+      // { href: "/dashboard/customer/notifications", label: "Messages & Notifications" },
+      // { href: "/dashboard/customer/reviews", label: "My Reviews" },
+      // { href: "/dashboard/customer/invoices", label: "Download Invoices" },
+      // { href: "/dashboard/customer/profile", label: "Account Settings" },
+      // { href: "/dashboard/customer/support", label: "Customer Support" },
     ],
     seller: [
       { href: "/dashboard/seller", label: "Dashboard" },
@@ -212,7 +212,7 @@ export default function DashboardLayout({ children }) {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-4 border-b border-border">
-            <Card className="p-3 text-center bg-primary text-primary-foreground">
+            {/* <Card className="p-3 text-center bg-primary text-primary-foreground">
               {!isCollapsed ? (
                 <div>
                   <h2 className="text-lg font-bold capitalize">{role} Panel</h2>
@@ -227,7 +227,7 @@ export default function DashboardLayout({ children }) {
                   </Badge>
                 </div>
               )}
-            </Card>
+            </Card> */}
             
             {/* Collapse Toggle Button - Desktop only */}
             {!isMobile && (
