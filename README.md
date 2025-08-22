@@ -8,7 +8,7 @@ A modern e-commerce web application for smartphones, built with Next.js, MongoDB
 
 1. **Clone the repository:**
    ```sh
-   git clone https://github.com/your-username/phone-market.git
+   git clone https://github.com/AananMunna/next-app
    cd phone-market
    ```
 
