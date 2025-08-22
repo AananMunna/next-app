@@ -31,7 +31,7 @@ const PhoneHubLogo = ({
       {/* Text part - only show if variant is 'full' */}
       {variant === "full" && (
         <span className="ml-2 text-xl font-bold tracking-tight text-foreground">
-          PhoneHub
+          PhoneMarket
         </span>
       )}
     </div>

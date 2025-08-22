@@ -34,7 +34,8 @@ export async function middleware(req) {
 export const config = {
   matcher: [
     "/dashboard/:path*",   // Protect all dashboard routes
-    "/trips/:path*",       // keep your trips protected
-    "/community/:path*",   // keep your community protected
+    "/cart/:path*",       // keep your trips protected
+    "/wishlist",   // keep your community protected
+    "/deals",   // keep your community protected
   ],
 };

@@ -10,7 +10,6 @@ import {
   ShoppingCart,
   User,
   Heart,
-  Phone,
   LogOut,
   PackageOpen,
   Shield,
@@ -18,10 +17,99 @@ import {
   Grid,
   Percent,
   UserCog,
-  Smartphone
+  Smartphone,
+  Phone,
+  Info,
+  HelpCircle,
+  Contact
 } from "lucide-react";
 import { ThemeToggle } from "@/lib/ThemeToggle";
 import PhoneHubLogo from "./PhoneHubLogo";
+
+// Centralized navigation configuration
+export const navConfig = {
+  mainNav: [
+    {
+      name: "Home",
+      href: "/",
+      icon: Home,
+      mobileOnly: false
+    },
+    {
+      name: "Products",
+      href: "/products",
+      icon: Grid,
+      mobileOnly: false
+    },
+    {
+      name: "Deals",
+      href: "/deals",
+      icon: Percent,
+      mobileOnly: false
+    },
+    {
+      name: "About",
+      href: "/about",
+      icon: Info,
+      mobileOnly: false
+    },
+    {
+      name: "Contact",
+      href: "/contact",
+      icon: Contact,
+      mobileOnly: false
+    }
+  ],
+  userNav: (session) => [
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: PackageOpen,
+      show: true
+    },
+    {
+      name: "Profile",
+      href: "/profile",
+      icon: UserCog,
+      show: true
+    },
+    {
+      name: "Admin",
+      href: "/admin",
+      icon: Shield,
+      show: session?.user?.role === "admin"
+    }
+  ],
+  mobileBottomNav: [
+    {
+      name: "Home",
+      href: "/",
+      icon: Home
+    },
+    {
+      name: "Products",
+      href: "/products",
+      icon: Grid
+    },
+    {
+      name: "Deals",
+      href: "/deals",
+      icon: Percent
+    },
+    {
+      name: "Cart",
+      href: "/cart",
+      icon: ShoppingCart,
+      showBadge: true
+    },
+    {
+      name: "Profile",
+      href: "/profile",
+      icon: User,
+      dynamicLabel: true // Will show "Login" if not authenticated
+    }
+  ]
+};
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -30,6 +118,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [cartItemsCount, setCartItemsCount] = useState(3); // Example count
 
   // Handle scroll for navbar background
   useEffect(() => {
@@ -75,6 +164,7 @@ export default function Navbar() {
             <button 
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-md hover:bg-accent"
+              aria-label="Toggle menu"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -84,36 +174,24 @@ export default function Navbar() {
           <Link
             href="/"
             className="flex items-center gap-2 font-bold text-xl text-primary"
+            aria-label="PhoneHub Home"
           >
-              <PhoneHubLogo/>
+            <PhoneHubLogo/>
           </Link>
 
           {/* Desktop Navigation - Hidden on mobile */}
           <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <Link
-              href="/"
-              className={`transition-colors hover:text-primary ${isActive("/") ? "text-primary font-semibold" : "text-foreground"}`}
-            >
-              Home
-            </Link>
-            <Link
-              href="/products"
-              className={`transition-colors hover:text-primary ${isActive("/products") ? "text-primary font-semibold" : "text-foreground"}`}
-            >
-              Products
-            </Link>
-            <Link
-              href="/deals"
-              className={`transition-colors hover:text-primary ${isActive("/deals") ? "text-primary font-semibold" : "text-foreground"}`}
-            >
-              Deals
-            </Link>
-            <Link
-              href="/about"
-              className={`transition-colors hover:text-primary ${isActive("/about") ? "text-primary font-semibold" : "text-foreground"}`}
-            >
-              About
-            </Link>
+            {navConfig.mainNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`transition-colors hover:text-primary ${
+                  isActive(item.href) ? "text-primary font-semibold" : "text-foreground"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </div>
 
           {/* Right side icons and actions */}
@@ -128,25 +206,43 @@ export default function Navbar() {
                   className="pl-9 w-[200px] lg:w-[300px] py-2 px-3 rounded-md border border-input bg-background text-sm"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  aria-label="Search products"
                 />
               </form>
             </div>
 
             <ThemeToggle />
 
-            <button className="p-2 rounded-md hover:bg-accent md:hidden">
+            <button 
+              className="p-2 rounded-md hover:bg-accent md:hidden"
+              aria-label="Search"
+              onClick={() => {
+                // Focus on search input when mobile search button is clicked
+                document.querySelector('input[type="search"]')?.focus();
+              }}
+            >
               <Search className="h-5 w-5" />
             </button>
 
-            <Link href="/wishlist" className="p-2 rounded-md hover:bg-accent">
+            <Link 
+              href="/wishlist" 
+              className="p-2 rounded-md hover:bg-accent"
+              aria-label="Wishlist"
+            >
               <Heart className="h-5 w-5" />
             </Link>
 
-            <Link href="/cart" className="p-2 rounded-md hover:bg-accent relative">
+            <Link 
+              href="/cart" 
+              className="p-2 rounded-md hover:bg-accent relative"
+              aria-label="Shopping cart"
+            >
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
-                3
-              </span>
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
+                  {cartItemsCount}
+                </span>
+              )}
             </Link>
 
             {session?.user ? (
@@ -154,43 +250,31 @@ export default function Navbar() {
                 <button 
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="p-2 rounded-full hover:bg-accent"
+                  aria-label="User profile"
                 >
                   <User className="h-5 w-5" />
                 </button>
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-popover text-popover-foreground rounded-md shadow-lg border z-50">
                     <div className="p-3 border-b">
-                      <p className="font-medium">{session.user.name}</p>
-                      <p className="text-muted-foreground text-xs">
+                      <p className="font-medium truncate">{session.user.name}</p>
+                      <p className="text-muted-foreground text-xs truncate">
                         {session.user.email}
                       </p>
                     </div>
                     <div className="p-1">
-                      <Link 
-                        href="/dashboard" 
-                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <PackageOpen className="h-4 w-4" />
-                        <span>Dashboard</span>
-                      </Link>
-                      <Link 
-                        href="/profile" 
-                        className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
-                        onClick={() => setIsProfileOpen(false)}
-                      >
-                        <UserCog className="h-4 w-4" />
-                        <span>Profile</span>
-                      </Link>
-                      {session.user.role === "admin" && (
-                        <Link 
-                          href="/admin" 
-                          className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
-                          onClick={() => setIsProfileOpen(false)}
-                        >
-                          <Shield className="h-4 w-4" />
-                          <span>Admin</span>
-                        </Link>
+                      {navConfig.userNav(session).map((item) => 
+                        item.show ? (
+                          <Link 
+                            key={item.href}
+                            href={item.href} 
+                            className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-accent text-sm"
+                            onClick={() => setIsProfileOpen(false)}
+                          >
+                            <item.icon className="h-4 w-4" />
+                            <span>{item.name}</span>
+                          </Link>
+                        ) : null
                       )}
                       <div className="border-t my-1"></div>
                       <button 
@@ -235,38 +319,21 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="md:hidden absolute top-full left-0 right-0 bg-background border-t shadow-lg z-40">
             <div className="p-4 space-y-4">
-              <Link 
-                href="/" 
-                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Home className="h-5 w-5" />
-                <span>Home</span>
-              </Link>
-              <Link 
-                href="/products" 
-                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/products") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Grid className="h-5 w-5" />
-                <span>Products</span>
-              </Link>
-              <Link 
-                href="/deals" 
-                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/deals") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Percent className="h-5 w-5" />
-                <span>Deals</span>
-              </Link>
-              <Link 
-                href="/about" 
-                className={`flex items-center gap-3 py-2 px-3 rounded-lg ${isActive("/about") ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <Shield className="h-5 w-5" />
-                <span>About Us</span>
-              </Link>
+              {navConfig.mainNav.map((item) => (
+                <Link 
+                  key={item.href}
+                  href={item.href} 
+                  className={`flex items-center gap-3 py-2 px-3 rounded-lg ${
+                    isActive(item.href) 
+                      ? "bg-primary text-primary-foreground" 
+                      : "hover:bg-accent"
+                  }`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span>{item.name}</span>
+                </Link>
+              ))}
               
               <div className="pt-4 border-t">
                 {session ? (
@@ -298,63 +365,26 @@ export default function Navbar() {
 
       {/* Mobile Bottom Navbar */}
       <div className="fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around items-center h-16 z-40 md:hidden">
-        <Link 
-          href="/" 
-          className="flex flex-col items-center gap-1 p-2"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <div className={`rounded-full p-1 ${isActive("/") ? "bg-primary text-primary-foreground" : ""}`}>
-            <Home className="h-5 w-5" />
-          </div>
-          <span className="text-xs">Home</span>
-        </Link>
-
-        <Link 
-          href="/products" 
-          className="flex flex-col items-center gap-1 p-2"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <div className={`rounded-full p-1 ${isActive("/products") ? "bg-primary text-primary-foreground" : ""}`}>
-            <Grid className="h-5 w-5" />
-          </div>
-          <span className="text-xs">Products</span>
-        </Link>
-
-        <Link 
-          href="/deals" 
-          className="flex flex-col items-center gap-1 p-2"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <div className={`rounded-full p-1 ${isActive("/deals") ? "bg-primary text-primary-foreground" : ""}`}>
-            <Percent className="h-5 w-5" />
-          </div>
-          <span className="text-xs">Deals</span>
-        </Link>
-
-        <Link 
-          href="/cart" 
-          className="flex flex-col items-center gap-1 p-2 relative"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <div className={`rounded-full p-1 ${isActive("/cart") ? "bg-primary text-primary-foreground" : ""}`}>
-            <ShoppingCart className="h-5 w-5" />
-          </div>
-          <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
-            3
-          </span>
-          <span className="text-xs">Cart</span>
-        </Link>
-
-        <Link 
-          href={session ? "/profile" : "/login"} 
-          className="flex flex-col items-center gap-1 p-2"
-          onClick={() => setIsMenuOpen(false)}
-        >
-          <div className={`rounded-full p-1 ${isActive("/profile") || isActive("/login") ? "bg-primary text-primary-foreground" : ""}`}>
-            <User className="h-5 w-5" />
-          </div>
-          <span className="text-xs">{session ? "Profile" : "Login"}</span>
-        </Link>
+        {navConfig.mobileBottomNav.map((item) => (
+          <Link 
+            key={item.href}
+            href={item.href} 
+            className="flex flex-col items-center gap-1 p-2 relative"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            <div className={`rounded-full p-1 ${isActive(item.href) ? "bg-primary text-primary-foreground" : ""}`}>
+              <item.icon className="h-5 w-5" />
+            </div>
+            {item.showBadge && cartItemsCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-4 w-4 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-xs">
+                {cartItemsCount}
+              </span>
+            )}
+            <span className="text-xs">
+              {item.dynamicLabel && !session ? "Login" : item.name}
+            </span>
+          </Link>
+        ))}
       </div>
     </>
   );

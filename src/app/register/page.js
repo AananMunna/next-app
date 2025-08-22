@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Mail, Lock, User, Smartphone, ArrowRight, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import PhoneHubLogo from "@/components/PhoneHubLogo";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -246,12 +247,12 @@ export default function RegisterPage() {
 
             <p className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <a
+              <Link
                 href="/login"
                 className="font-medium text-primary hover:underline"
               >
                 Sign in
-              </a>
+              </Link>
             </p>
           </CardFooter>
         </Card>
@@ -260,13 +261,13 @@ export default function RegisterPage() {
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground">
             By creating an account, you agree to our{" "}
-            <a href="/terms" className="text-primary hover:underline">
+            <Link href="/terms" className="text-primary hover:underline">
               Terms of Service
-            </a>{" "}
+            </Link>{" "}
             and{" "}
-            <a href="/privacy" className="text-primary hover:underline">
+            <Link href="/privacy" className="text-primary hover:underline">
               Privacy Policy
-            </a>
+            </Link>
             .
           </p>
         </div>

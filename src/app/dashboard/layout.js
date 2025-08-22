@@ -212,13 +212,14 @@ export default function DashboardLayout({ children }) {
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="p-4 border-b border-border">
-            {/* <Card className="p-3 text-center bg-primary text-primary-foreground">
+            <Card className="p-3 text-center bg-primary text-primary-foreground">
               {!isCollapsed ? (
                 <div>
-                  <h2 className="text-lg font-bold capitalize">{role} Panel</h2>
+                  <h2 className="text-lg font-bold capitalize">Dashboard</h2>
+                  {/* <h2 className="text-lg font-bold capitalize">{role} Panel</h2>
                   <Badge className="mt-1 bg-primary-foreground text-primary font-semibold">
                     {role.toUpperCase()}
-                  </Badge>
+                  </Badge> */}
                 </div>
               ) : (
                 <div className="flex justify-center">
@@ -227,7 +228,7 @@ export default function DashboardLayout({ children }) {
                   </Badge>
                 </div>
               )}
-            </Card> */}
+            </Card>
             
             {/* Collapse Toggle Button - Desktop only */}
             {!isMobile && (
